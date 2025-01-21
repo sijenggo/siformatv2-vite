@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { ambil_data } from "./control/services";
+import React, { useEffect, useState } from "react";
+import { ambil_data, modalGeneral as ModalGeneral } from "./control/services";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "react-bootstrap";
+import SelectJabatan from "./control/pejabat";
 
 const fetchLoketData = async () => {
     return await ambil_data(
@@ -13,15 +14,48 @@ const fetchConfigData = async () => {
     return await ambil_data("SELECT * FROM sys_config");
 };
 
-const RenderBeranda = ({}) => {
-    const[showKep, setShowKep] = useState(null);
+const fetchKepData = async (id_loket) => {
+    return await ambil_data(
+      `SELECT * FROM sys_keperluan WHERE id_loket = ${id_loket}`
+    );
+};
+
+const RenderBeranda = () => {
+    const [showKep, setShowKep] = useState(false);
+    const [selectedLoket, setSelectedLoket] = useState(null);
+	const [warna, setWarna] = useState('blue');
+	const [idloket, setidloket] = useState('');
+	const [kode, setkode] = useState('');
+	const [idkeperluan, setidkeperluan] = useState('');
+	const [keperluanlain, setkeperluanlain] = useState('');
+	const [showModal, setShowModal] = useState(false);
+    const [itemJudul, setItemJudul] = useState('');
+    const [itemBody, setItemBody] = useState(null);
+    const [showNamaPej, setShowNamaPej] = useState(false);
+    const config = JSON.parse(localStorage.getItem('config'))
+
+    useEffect(()=>{
+        if(selectedLoket == 'tamu'){
+            KunjunganTamu();
+        }
+    }, [selectedLoket]);
+
     const { 
         data: loket = [], 
         isLoading: isLoadingLoket, 
         error: errorLoket
     } = useQuery({queryKey: ["loket"], queryFn: fetchLoketData});
 
-    
+    const {
+        data: kep = [],
+        isLoading: isLoadingKep,
+        error: errorKep,
+    } = useQuery({
+        queryKey: ["kep", selectedLoket],
+        queryFn: () => fetchKepData(selectedLoket),
+        enabled: !!selectedLoket && selectedLoket !== 'tamu',
+    });
+
     if (isLoadingLoket){
         return(
             <Spinner animation="border" role="status">
@@ -32,12 +66,32 @@ const RenderBeranda = ({}) => {
 
     if (errorLoket) return <div>Error fetching loket data: {errorLoket.message}</div>;
 
-    const handleFigureClick = (item) => {
-        setShowKep(true);
+    const handleFigureClick = (id_loket, id_warna, id_kode) => {
+		if (id_loket != 1) {
+            setSelectedLoket(id_loket);
+			setShowKep(true);
+			setWarna(id_warna);
+			setidloket(id_loket);
+			setkode(id_kode);
+            console.log(id_loket);
+		} else {
+            setSelectedLoket('tamu');
+            setShowKep(false);
+            setShowModal(true);
+		}
     };
 
     const handleKembali = () =>{
         setShowKep(false);
+    }
+
+    const handleInputChange = (event) => {
+		setkeperluanlain(event.target.value);
+	};
+
+    const KunjunganTamu = () =>{
+        setItemJudul(`Kunjungan Tamu ke ${config.nama_satker}`);
+        setItemBody(<SelectJabatan ptspplus={config.ptspplus} />);
     }
 
     if (showKep) {
@@ -60,7 +114,7 @@ const RenderBeranda = ({}) => {
                             ) : (
                                 <div className="form-group">
                                     <div className="input-group mb-3">
-                                        <input type="text" className="form-control form-control-lg fonts-19" aria-describedby="button-addon2" placeholder="Keperluan Lain .." />
+                                        <input value={keperluanlain} onChange={handleInputChange} className="form-control form-control-lg fonts-19" aria-describedby="button-addon2" placeholder="Keperluan Lain .." />
                                         <div className="input-group-append">
                                             <button disabled={!keperluanlain.trim()} className="btn btn-lg btn-secondary fonts-19" type="button" id="button-addon2">Pilih</button>
                                         </div>
@@ -100,50 +154,76 @@ const RenderBeranda = ({}) => {
             </figure>
           </div>
         ))}
+        <ModalGeneral
+            show={showModal}
+            onHide={() => setShowModal(false)}
+            itemJudul={itemJudul}
+            itemBody={itemBody}
+        />
       </div>
     );
 };
 
-const RenderConfig = () =>{
-    const { data: config = [], isLoading: isLoadingConfig, error: errorConfig} = useQuery({queryKey: ["config"], queryFn: fetchConfigData});
-    
-    if (isLoadingConfig){
-        return(
-            <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading...</span>
-            </Spinner>
-        )
-    }
+const RenderConfig = () => {
+    const { data: config = [] } = useQuery({
+      queryKey: ["config"],
+      queryFn: fetchConfigData,
+    });
+  
+    useEffect(() => {
+      if (config.length > 0) {
+        localStorage.setItem('config', JSON.stringify(config[0]));
+      }
+    }, [config]);
+  
+    return null;
+};
 
-    if (errorConfig) return <div>Error fetching config data: {errorConfig.message}</div>;
-    return config[0].nama_satker;
-}
-
-const Home = () =>{
-    return(
-        <>
-            <div className="limiter">
-				<div className="background-container">
-					<div className="wrap">
-						<div className="container h-100 display-container">
-							<div className="row text-center h-auto">
-								<div className="col judul">
-									<h1><RenderConfig /></h1>
-								</div>
-							</div>
-							<div className="row text-center mb-3 h-auto">
-								<div className="col">
-									<h3>Silahkan Ambil Antrian Anda ..</h3>
-								</div>
-							</div>
-						</div>
-						<div className="container">
-                            <RenderBeranda />
-						</div>
-					</div>
-				</div>
-			</div>
-        </>
+const Home = () => {
+    const [namaSatker, setNamaSatker] = useState('');
+  
+    useEffect(() => {
+      const updateConfig = () => {
+        const storedConfig = localStorage.getItem('config');
+        if (storedConfig) {
+          const parsedConfig = JSON.parse(storedConfig);
+          setNamaSatker(parsedConfig.nama_satker || '');
+        }
+      };
+      
+      updateConfig();
+      window.addEventListener('storage', updateConfig);
+  
+      return () => {
+        window.removeEventListener('storage', updateConfig);
+      };
+    }, []);
+  
+    return (
+      <>
+        <RenderConfig />
+        <div className="limiter">
+            <div className="background-container">
+                <div className="wrap">
+                    <div className="container h-100 display-container">
+                        <div className="row text-center h-auto">
+                            <div className="col judul">
+                                <h1>{namaSatker ? `${namaSatker}` : 'Loading...'}</h1>
+                            </div>
+                        </div>
+                        <div className="row text-center mb-3 h-auto">
+                            <div className="col">
+                                <h3>Silahkan Ambil Antrian Anda ..</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="container">
+                        <RenderBeranda />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </>
     )
 }
 
