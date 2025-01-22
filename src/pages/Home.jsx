@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ambil_data, modalGeneral as ModalGeneral } from "./control/services";
 import { useQuery } from "@tanstack/react-query";
-import { Spinner } from "react-bootstrap";
+import { Spinner, Button } from "react-bootstrap";
 import SelectJabatan from "./control/pejabat";
 
 const fetchLoketData = async () => {
@@ -24,14 +24,12 @@ const RenderBeranda = () => {
     const [showKep, setShowKep] = useState(false);
     const [selectedLoket, setSelectedLoket] = useState(null);
 	const [warna, setWarna] = useState('blue');
-	const [idloket, setidloket] = useState('');
-	const [kode, setkode] = useState('');
 	const [idkeperluan, setidkeperluan] = useState('');
 	const [keperluanlain, setkeperluanlain] = useState('');
 	const [showModal, setShowModal] = useState(false);
     const [itemJudul, setItemJudul] = useState('');
     const [itemBody, setItemBody] = useState(null);
-    const [showNamaPej, setShowNamaPej] = useState(false);
+    const [itemFooter, setItemFooter] = useState(null);
     const config = JSON.parse(localStorage.getItem('config'))
 
     useEffect(()=>{
@@ -71,8 +69,6 @@ const RenderBeranda = () => {
             setSelectedLoket(id_loket);
 			setShowKep(true);
 			setWarna(id_warna);
-			setidloket(id_loket);
-			setkode(id_kode);
             console.log(id_loket);
 		} else {
             setSelectedLoket('tamu');
@@ -91,7 +87,7 @@ const RenderBeranda = () => {
 
     const KunjunganTamu = () =>{
         setItemJudul(`Kunjungan Tamu ke ${config.nama_satker}`);
-        setItemBody(<SelectJabatan ptspplus={config.ptspplus} />);
+        setItemBody(<SelectJabatan ptspplus={config.ptspplus} onHide={() => setShowModal(false)} />);
     }
 
     if (showKep) {
@@ -159,6 +155,7 @@ const RenderBeranda = () => {
             onHide={() => setShowModal(false)}
             itemJudul={itemJudul}
             itemBody={itemBody}
+            itemFooter={itemFooter}
         />
       </div>
     );
@@ -183,20 +180,20 @@ const Home = () => {
     const [namaSatker, setNamaSatker] = useState('');
   
     useEffect(() => {
-      const updateConfig = () => {
-        const storedConfig = localStorage.getItem('config');
-        if (storedConfig) {
-          const parsedConfig = JSON.parse(storedConfig);
-          setNamaSatker(parsedConfig.nama_satker || '');
-        }
-      };
+        const updateConfig = () => {
+            const storedConfig = localStorage.getItem('config');
+            if (storedConfig) {
+                const parsedConfig = JSON.parse(storedConfig);
+                setNamaSatker(parsedConfig.nama_satker || '');
+            }
+        };
       
-      updateConfig();
-      window.addEventListener('storage', updateConfig);
-  
-      return () => {
-        window.removeEventListener('storage', updateConfig);
-      };
+        updateConfig();
+        window.addEventListener('storage', updateConfig);
+
+        return () => {
+            window.removeEventListener('storage', updateConfig);
+        };
     }, []);
   
     return (
