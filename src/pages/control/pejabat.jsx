@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { Form, Button, Modal } from 'react-bootstrap';
 import { useQuery } from "@tanstack/react-query";
-import { ambil_data, tambah_data, fetchJabPTSP, fetchJabNama, fetchIndex, formattedDateHourMinute, formattedDate } from './services';
+import { ambil_data, tambah_data, fetchJabPTSP, fetchJabNama, fetchIndex, formattedDateHourMinute, formattedDate, alertNotif } from './services';
 import * as formik from 'formik';
 import * as Yup from 'yup';
+import Swal from 'sweetalert2';
 
 const fetchJabatanData = async (ptspPlus) => {
     if (ptspPlus == 1) {
@@ -221,14 +222,14 @@ const SelectJabatan = ({ptspplus, onHide}) => {
             const result = await tambah_data(table, data, ptspplus);
             
             if (result.success) {
-                console.log('Data berhasil disimpan');
                 onHide();
+                Swal.fire("Terimakasih..", "", "success");
             } else {
-                console.log('Gagal menyimpan data: ' + result.message);
+                alertNotif('error', 'Data error', result.message, `<p class="p-0 mb-0 fs-xsmall">Error pada proses simpan data</p>`);
             }
         } catch (error) {
           console.error('Error during submit:', error);
-          console.log('Terjadi kesalahan saat menyimpan data.');
+          alertNotif('error', 'Data error', error, `<p class="p-0 mb-0 fs-xsmall">Error pada proses simpan data</p>`);
         }
     };
 
@@ -303,11 +304,6 @@ const SelectJabatan = ({ptspplus, onHide}) => {
                 </Form>
             )}
         </Formik>
-        <Modal.Footer>
-            <Button type='button' variant="primary" onClick={onHide}>
-                Close
-            </Button>
-        </Modal.Footer>
     </>
     )
 };

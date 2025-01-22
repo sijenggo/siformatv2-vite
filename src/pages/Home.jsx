@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ambil_data, modalGeneral as ModalGeneral } from "./control/services";
 import { useQuery } from "@tanstack/react-query";
-import { Spinner, Button } from "react-bootstrap";
+import { Spinner, Button, InputGroup, Form } from "react-bootstrap";
 import SelectJabatan from "./control/pejabat";
 
 const fetchLoketData = async () => {
@@ -69,7 +69,7 @@ const RenderBeranda = () => {
             setSelectedLoket(id_loket);
 			setShowKep(true);
 			setWarna(id_warna);
-            console.log(id_loket);
+            setkeperluanlain('');
 		} else {
             setSelectedLoket('tamu');
             setShowKep(false);
@@ -108,14 +108,19 @@ const RenderBeranda = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="form-group">
-                                    <div className="input-group mb-3">
-                                        <input value={keperluanlain} onChange={handleInputChange} className="form-control form-control-lg fonts-19" aria-describedby="button-addon2" placeholder="Keperluan Lain .." />
-                                        <div className="input-group-append">
-                                            <button disabled={!keperluanlain.trim()} className="btn btn-lg btn-secondary fonts-19" type="button" id="button-addon2">Pilih</button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <>
+                                    <InputGroup className="mb-3">
+                                        <Form.Control
+                                            placeholder="Keperluan Lain .."
+                                            size="lg"
+                                            value={keperluanlain} 
+                                            onChange={handleInputChange}
+                                        />
+                                        <Button disabled={!keperluanlain.trim()} variant="secondary" size="lg">
+                                            Pilih
+                                        </Button>
+                                    </InputGroup>
+                                </>
                             )}
                         </div>
                     ))}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import Swal from "sweetalert2";
 import { Modal } from "react-bootstrap";
 import { format } from "date-fns";
 const BASE_URL = `http://192.168.3.7/siformatv2/backend/api/`; //taruh apimu disini
@@ -95,3 +96,12 @@ export const formattedDate = (date) =>{
 export const formattedDateHourMinute = (date) =>{
   return format(date, 'yyyy-MM-dd HH:mm:ss');
 };
+
+export const alertNotif = (icon, title, text, footer) =>{
+  Swal.fire({
+      icon: icon,
+      title: title,
+      text: text,
+      footer: footer
+    });
+}
