@@ -796,3 +796,48 @@ figure.card figcaption .info span i {
 div.dataTables_wrapper div.dataTables_info{
   padding: 0 !important;
 }
+
+.bg-container {
+  width: 100%;  
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-image: url('../images/bg.svg');
+}
+
+.h-min75{
+  height: 97.5vh;
+}
+
+.main-display {
+  background-color: rgba(248, 249, 250, 0.9);
+  border-radius: 10px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.col-70 {
+  height: 70%;
+}
+
+.col-30 {
+  height: 30%;
+}
+
+.fs-big{
+  font-size: 6rem;
+}
+
+.red-box {
+  width: 85%; /* Sesuaikan dengan lebar Col */
+  height: auto; /* Jaga rasio */
+  aspect-ratio: 16 / 9; /* Rasio 16:9 */
+  background-color: red; /* Latar belakang merah */
+  max-height: 100%; /* Batasi tinggi agar tidak melebihi parent Col */
+  max-width: 100%; /* Batasi lebar agar tidak melebihi parent Col */
+}

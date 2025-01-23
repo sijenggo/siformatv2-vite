@@ -42,8 +42,10 @@ const SelectJabatan = ({ptspplus, onHide}) => {
         const selectNama = (event) => {
             const id = event.target.value;
             const nama = event.target.selectedOptions[0].getAttribute('data-nama');
+            const jabatan = event.target.selectedOptions[0].getAttribute('data-jabatan');
             setFieldValue('selIdnamapejab', id); 
             setFieldValue('selNamapejab', nama);  
+            setFieldValue('selNamajab', jabatan);     
         };
 
         if(selIdjab !== ''){
@@ -59,7 +61,7 @@ const SelectJabatan = ({ptspplus, onHide}) => {
                         >
                             <option value="">Pilih Pejabat yang ditemui ..</option>
                             {Object.entries(namaPejabat).map(([key, value]) => (
-                                <option key={key} value={value[1]} data-nama={value[0]} data-id={value[1]}>
+                                <option key={key} value={value[1]} data-nama={value[0]} data-jabatan={value[2]} data-id={value[1]}>
                                     {value[0]}
                                 </option>
                             ))}
@@ -117,7 +119,6 @@ const SelectJabatan = ({ptspplus, onHide}) => {
             const jabatan = event.target.selectedOptions[0].getAttribute('data-jabatan');
             setSelidjab(selectedValue);
             setFieldValue('selIdjab', selectedValue);
-            setFieldValue('selNamajab', jabatan);      
     
             if (ptspplus !== undefined) {
                 const response = await fetchNamaPejData(ptspplus, selectedValue);
@@ -303,8 +304,8 @@ const SelectJabatan = ({ptspplus, onHide}) => {
                     </div>
                 </Form>
             )}
-        </Formik>
-    </>
+            </Formik>
+        </>
     )
 };
 

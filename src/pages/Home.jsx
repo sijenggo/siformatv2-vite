@@ -3,6 +3,7 @@ import { ambil_data, modalGeneral as ModalGeneral } from "./control/services";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner, Button, InputGroup, Form } from "react-bootstrap";
 import SelectJabatan from "./control/pejabat";
+import AntrianPtsp from "./control/antrian";
 
 const fetchLoketData = async () => {
     return await ambil_data(
@@ -20,23 +21,12 @@ const fetchKepData = async (id_loket) => {
     );
 };
 
-const RenderBeranda = () => {
+const RenderBeranda = ({bukaModal, tutupModal}) => {
     const [showKep, setShowKep] = useState(false);
     const [selectedLoket, setSelectedLoket] = useState(null);
 	const [warna, setWarna] = useState('blue');
-	const [idkeperluan, setidkeperluan] = useState('');
 	const [keperluanlain, setkeperluanlain] = useState('');
-	const [showModal, setShowModal] = useState(false);
-    const [itemJudul, setItemJudul] = useState('');
-    const [itemBody, setItemBody] = useState(null);
-    const [itemFooter, setItemFooter] = useState(null);
     const config = JSON.parse(localStorage.getItem('config'))
-
-    useEffect(()=>{
-        if(selectedLoket == 'tamu'){
-            KunjunganTamu();
-        }
-    }, [selectedLoket]);
 
     const { 
         data: loket = [], 
@@ -54,6 +44,45 @@ const RenderBeranda = () => {
         enabled: !!selectedLoket && selectedLoket !== 'tamu',
     });
 
+    const handleFigureClick = (id_loket, id_warna, id_kode) => {
+		if (id_loket != 1) {
+            setSelectedLoket(id_loket);
+			setShowKep(true);
+			setWarna(id_warna);
+            setkeperluanlain('');
+		} else {
+            setSelectedLoket('tamu');
+            setShowKep(false);
+            KunjunganTamu();
+		}
+    };
+
+    const handleKembali = () =>{
+        setShowKep(false);
+    }
+
+    const closeModal = () =>{
+        setSelectedLoket(null);
+        setShowKep(false);
+        tutupModal();
+    }
+
+    const handleInputChange = (event) => {
+		setkeperluanlain(event.target.value);
+	};
+
+    const KunjunganTamu = () =>{
+        let header = `Kunjungan Tamu ke ${config.nama_satker}`
+        let body = <SelectJabatan ptspplus={config.ptspplus} onHide={closeModal} />
+        bukaModal(header, body);
+    }
+
+    const FormAntrianPtsp = (id_keperluan) =>{
+        let header =`Antrian PTSP ${config.nama_satker}`
+        let body = <AntrianPtsp ptspplus={config.ptspplus} onHide={closeModal} id_loket={selectedLoket} id_keperluan={id_keperluan} keperluanlain={keperluanlain} />
+        bukaModal(header, body);
+    }
+
     if (isLoadingLoket){
         return(
             <Spinner animation="border" role="status">
@@ -64,32 +93,6 @@ const RenderBeranda = () => {
 
     if (errorLoket) return <div>Error fetching loket data: {errorLoket.message}</div>;
 
-    const handleFigureClick = (id_loket, id_warna, id_kode) => {
-		if (id_loket != 1) {
-            setSelectedLoket(id_loket);
-			setShowKep(true);
-			setWarna(id_warna);
-            setkeperluanlain('');
-		} else {
-            setSelectedLoket('tamu');
-            setShowKep(false);
-            setShowModal(true);
-		}
-    };
-
-    const handleKembali = () =>{
-        setShowKep(false);
-    }
-
-    const handleInputChange = (event) => {
-		setkeperluanlain(event.target.value);
-	};
-
-    const KunjunganTamu = () =>{
-        setItemJudul(`Kunjungan Tamu ke ${config.nama_satker}`);
-        setItemBody(<SelectJabatan ptspplus={config.ptspplus} onHide={() => setShowModal(false)} />);
-    }
-
     if (showKep) {
         return (
             <div className="w-100">
@@ -98,7 +101,7 @@ const RenderBeranda = () => {
                         <div key={index} className="m-2">
                             {item.keperluan !== 'lainlain' ? (
                                 <div>
-                                    <button className="button-kep">
+                                    <button onClick={() => FormAntrianPtsp(item.id_keperluan)} className="button-kep">
                                         <span>
                                             {item.keperluan}
                                         </span>
@@ -116,7 +119,7 @@ const RenderBeranda = () => {
                                             value={keperluanlain} 
                                             onChange={handleInputChange}
                                         />
-                                        <Button disabled={!keperluanlain.trim()} variant="secondary" size="lg">
+                                        <Button onClick={() => FormAntrianPtsp(item.id_keperluan)} disabled={!keperluanlain.trim()} variant="secondary" size="lg">
                                             Pilih
                                         </Button>
                                     </InputGroup>
@@ -155,13 +158,6 @@ const RenderBeranda = () => {
             </figure>
           </div>
         ))}
-        <ModalGeneral
-            show={showModal}
-            onHide={() => setShowModal(false)}
-            itemJudul={itemJudul}
-            itemBody={itemBody}
-            itemFooter={itemFooter}
-        />
       </div>
     );
 };
@@ -183,6 +179,9 @@ const RenderConfig = () => {
 
 const Home = () => {
     const [namaSatker, setNamaSatker] = useState('');
+	const [showModal, setShowModal] = useState(false);
+    const [itemHeader, setItemHeader] = useState('');
+    const [itemBody, setItemBody] = useState(null);
   
     useEffect(() => {
         const updateConfig = () => {
@@ -200,6 +199,18 @@ const Home = () => {
             window.removeEventListener('storage', updateConfig);
         };
     }, []);
+
+    const bukaModal = (judul, body) => {
+        setItemHeader(judul);
+        setItemBody(body);
+        setShowModal(true);
+    };
+
+    const tutupModal = () =>{
+        setShowModal(false);
+        setItemHeader('');
+        setItemBody(null);
+    }
   
     return (
       <>
@@ -220,7 +231,13 @@ const Home = () => {
                         </div>
                     </div>
                     <div className="container">
-                        <RenderBeranda />
+                        <RenderBeranda bukaModal={bukaModal} tutupModal={tutupModal} />
+                        <ModalGeneral
+                            show={showModal}
+                            onHide={tutupModal}
+                            itemJudul={itemHeader}
+                            itemBody={itemBody}
+                        />
                     </div>
                 </div>
             </div>
