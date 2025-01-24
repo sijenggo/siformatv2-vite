@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"name": "siformatv2",
+			"path": "../siformatv2"
+		},
+		{
+			"name": "siformatv2-vite",
+			"path": "."
+		},
+		{
+			"name": "maues",
+			"path": "../maues"
+		},
+		{
+			"name": "SSH FS - jenggo@192.168.3.7/var/www/html/siformatv2",
+			"uri": "ssh://jenggo@192.168.3.7/var/www/html/siformatv2"
+		},
+		{
+			"name": "SSH FS - jenggo@192.168.3.7/var/www/html/ptsp",
+			"uri": "ssh://jenggo@192.168.3.7/var/www/html/ptsp"
+		},
+		{
+			"name": "etamu",
+			"path": "../etamu"
+		},
+		{
+			"name": "panggilan-sidang",
+			"path": "../panggilan-sidang"
+		}
+	],
+	"settings": {}
+}

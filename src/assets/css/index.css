@@ -808,6 +808,24 @@ div.dataTables_wrapper div.dataTables_info{
   background-position: center;
   background-size: cover;
   background-image: url('../images/bg.svg');
+}  
+
+.main-container {
+  width: 100%;
+  height: 98.5vh; /* Tinggi penuh layar */
+  padding: 10px;
+  overflow: hidden; /* Mencegah scroll di main-container */
+}
+
+.main-content {
+  overflow-y: scroll; /* Scroll hanya untuk vertikal */
+  height: 100%; /* Pastikan mengambil ruang yang tersedia */
+  width: 100%;
+}
+
+.main-content::-webkit-scrollbar {
+  width: 0px; /* Menyembunyikan scrollbar secara visual */
+  height: 0px;
 }
 
 .h-min75{
@@ -818,8 +836,15 @@ div.dataTables_wrapper div.dataTables_info{
   background-color: rgba(248, 249, 250, 0.9);
   border-radius: 10px;
   overflow: hidden;
-  height: 100%;
 }
+
+.main-container,
+.h-70,
+.h-30,
+.main-display {
+  outline: 1px solid red; /* Debugging */
+}
+
 
 .col-70 {
   height: 70%;
@@ -831,6 +856,10 @@ div.dataTables_wrapper div.dataTables_info{
 
 .fs-big{
   font-size: 6rem;
+}
+
+.fs-small{
+  font-size:x-small;
 }
 
 .red-box {
