@@ -69,13 +69,15 @@ const Papan = () =>{
                                         <div className="main-display p-1 h-100">
                                             <Container fluid className="h-100">
                                                 <Row className="h-100">
-                                                    <Col className="h-100">
+                                                    <Col className="h-100 d-flex flex-column align-items-center">
+                                                    <div>
                                                         <h5>Meja PTSP Perdata</h5>
+                                                        </div>
                                                         <div className="main-content">
                                                             {loadingPerdata ? (
                                                                 <p>Loading data Perdata...</p>
                                                             ) : antrianPerdata.length > 0 ? (
-                                                                <Table borderless hover size="sm" responsive='sm' className="fs-small">
+                                                                <table borderless hover size="sm" responsive='sm' className="fs-small">
                                                                     <tbody>
                                                                     {antrianPerdata.map((item) => (
                                                                         <tr key={item.id_antrian}>
@@ -83,8 +85,7 @@ const Papan = () =>{
                                                                         </tr>
                                                                     ))}
                                                                     </tbody>
-                                                                </Table>
-                                                                
+                                                                </table>
                                                             ) : (
                                                                 <p>Tidak ada antrian.</p>
                                                             )}
