@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from "react"; 
+import React from "react"; 
 import { ambil_data, formattedDate } from "./control/services";
 import { useQuery } from "@tanstack/react-query";
-import { Col, Container, Row, Button, Table, Modal } from "react-bootstrap";
+import { Col, Container, Row} from "react-bootstrap";
+import AutoScrollTable from "./control/autoscroll";
 
 const fetchAntrian = async (id_loket) => {
-    //let today = new Date();
-    let dite = new Date();
+    let today = new Date();
+    /*let dite = new Date();
     let today = new Date(dite);
-    today.setDate(dite.getDate() - 1);
+    today.setDate(dite.getDate() - 1);*/
     let date = formattedDate(today);
     return await ambil_data(
-      `SELECT * FROM tmp_antrian WHERE DATE(waktu) = '${date}' ORDER BY id_antrian DESC`
+      `SELECT * FROM tmp_antrian ORDER BY id_antrian DESC`
     );
 };
+
 
 const Papan = () =>{
     const { data: antrianPerdata = [], isLoading: loadingPerdata } = useQuery({
@@ -39,6 +41,10 @@ const Papan = () =>{
       queryKey: ["antrian", 6],
       queryFn: () => fetchAntrian(6),
     });
+
+    const handleOnEnd = () => {
+        console.log("End");
+    }
 
     return(
         <>
@@ -68,27 +74,13 @@ const Papan = () =>{
                                     <Col className="h-100">
                                         <div className="main-display p-1 h-100">
                                             <Container fluid className="h-100">
-                                                <Row className="h-100">
+                                                <Row className="h-100 p-2">
                                                     <Col className="h-100 d-flex flex-column align-items-center">
-                                                    <div>
-                                                        <h5>Meja PTSP Perdata</h5>
+                                                        <div>
+                                                            <h5>Meja PTSP Perdata</h5>
                                                         </div>
                                                         <div className="main-content">
-                                                            {loadingPerdata ? (
-                                                                <p>Loading data Perdata...</p>
-                                                            ) : antrianPerdata.length > 0 ? (
-                                                                <table borderless hover size="sm" responsive='sm' className="fs-small">
-                                                                    <tbody>
-                                                                    {antrianPerdata.map((item) => (
-                                                                        <tr key={item.id_antrian}>
-                                                                        <td>{item.nama}</td>
-                                                                        </tr>
-                                                                    ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            ) : (
-                                                                <p>Tidak ada antrian.</p>
-                                                            )}
+                                                            <AutoScrollTable antrian={antrianPerdata} loading={loadingPerdata} handleOnEnd={handleOnEnd} />
                                                         </div>
                                                     </Col>
                                                     <Col>2</Col>

@@ -105,3 +105,19 @@ export const alertNotif = (icon, title, text, footer) =>{
       footer: footer
     });
 }
+
+export const prepText = (id_loket, nomor_antrian) => {
+  let teks = "";
+  if(id_loket == 2){
+      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Perdata.`;
+  }else if(id_loket == 3){
+      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Pidana.`;
+  }else if(id_loket == 4){
+      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Hukum.`;
+  }else if(id_loket == 5){
+      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Umum.`;
+  }else if(id_loket == 6){
+      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Ecourt.`;
+  }
+  return teks;
+}

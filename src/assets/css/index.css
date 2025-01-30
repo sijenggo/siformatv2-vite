@@ -838,14 +838,6 @@ div.dataTables_wrapper div.dataTables_info{
   overflow: hidden;
 }
 
-.main-container,
-.h-70,
-.h-30,
-.main-display {
-  outline: 1px solid red; /* Debugging */
-}
-
-
 .col-70 {
   height: 70%;
 }
@@ -860,6 +852,15 @@ div.dataTables_wrapper div.dataTables_info{
 
 .fs-small{
   font-size:smaller;
+}
+
+.non-bg{
+  --bs-table-bg: none !important;
+}
+
+.non-pad{
+  --bs-btn-padding-y: 0rem !important;
+  --bs-btn-padding-x: 0.25rem !important;
 }
 
 .red-box {
