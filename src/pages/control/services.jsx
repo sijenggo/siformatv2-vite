@@ -4,6 +4,12 @@ import { Modal } from "react-bootstrap";
 import { format } from "date-fns";
 const BASE_URL = `http://192.168.3.7/siformatv2/backend/api/`; //taruh apimu disini
 
+export const connectWs = (url, onMessage) => {
+  const ws = new WebSocket(url);
+  ws.onmessage = onMessage;
+  return ws;  
+}
+
 //fungsi data DB
 export const ambil_data = async (query) => {
     try {
@@ -108,16 +114,17 @@ export const alertNotif = (icon, title, text, footer) =>{
 
 export const prepText = (id_loket, nomor_antrian) => {
   let teks = "";
+  let parts = nomor_antrian.split(" - ");
   if(id_loket == 2){
-      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Perdata.`;
+      teks = `Nomor antrian, ${parts[0]}, ${parts[1]}, silakan menuju meja PTSP Perdata.`;
   }else if(id_loket == 3){
-      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Pidana.`;
+      teks = `Nomor antrian, ${parts[0]}, ${parts[1]}, silakan menuju meja PTSP Pidana.`;
   }else if(id_loket == 4){
-      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Hukum.`;
+      teks = `Nomor antrian, ${parts[0]}, ${parts[1]}, silakan menuju meja PTSP Hukum.`;
   }else if(id_loket == 5){
-      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Umum.`;
+      teks = `Nomor antrian, ${parts[0]}, ${parts[1]}, silakan menuju meja PTSP Umum.`;
   }else if(id_loket == 6){
-      teks = `Nomor antrian ${nomor_antrian}, silakan menuju meja PTSP Ecourt.`;
+      teks = `Nomor antrian, ${parts[0]}, ${parts[1]}, silakan menuju meja PTSP Ecourt.`;
   }
   return teks;
 }

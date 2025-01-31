@@ -14,7 +14,7 @@ const validationSchema = Yup.object({
       .required('Nomor HP wajib diisi.'),
 });
 
-const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain}) =>{
+const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, kirimCetak}) =>{
     const { Formik } = formik;
     const submit = async(values) =>{
         let today = new Date();
@@ -129,6 +129,7 @@ const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain}) 
             if (post_antrian.success && post_tmp_antrian.success) {
                 onHide();
                 Swal.fire("Terimakasih..", "", "success");
+                kirimCetak(id_loket);
             } else {
                 alertNotif('error', 'Data error', `${post_antrian.message} ${post_tmp_antrian.message}`, `<p class="p-0 mb-0 fs-xsmall">Error pada proses simpan data</p>`);
             }
@@ -137,6 +138,7 @@ const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain}) 
             alertNotif('error', 'Data error', error, `<p class="p-0 mb-0 fs-xsmall">Error pada proses simpan data</p>`);
         }
     }
+
     return(
         <>
             <Formik

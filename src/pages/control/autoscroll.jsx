@@ -81,11 +81,11 @@ const ItemPanggil = ({ id, id_loket, nomor_antrian, ket, onSpeechEnd, onSpeechSt
         <>
             {!isPlayingJingle && speechStatus !== "started" && !isInQueue ? (
                 <Button id={id} onClick={handleStart} variant="outline-primary" size="sm" className="non-pad">
-                    <i className="fa-solid fa-circle-play fa-beat-fade fa-2xs"></i>
+                    <i className="fa-solid fa-circle-play fa-beat-fade fa-sm"></i>
                 </Button>
             ) : (
                 <Button id={id} onClick={handleStop} variant="outline-danger" size="sm" className="non-pad">
-                    <i className="fa-solid fa-circle-stop fa-beat-fade"></i>
+                    <i className="fa-solid fa-circle-stop fa-beat-fade fa-sm"></i>
                 </Button>
             )}
         </>

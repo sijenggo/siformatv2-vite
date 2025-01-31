@@ -864,10 +864,9 @@ div.dataTables_wrapper div.dataTables_info{
 }
 
 .red-box {
-  width: 85%; /* Sesuaikan dengan lebar Col */
-  height: auto; /* Jaga rasio */
-  aspect-ratio: 16 / 9; /* Rasio 16:9 */
-  background-color: red; /* Latar belakang merah */
-  max-height: 100%; /* Batasi tinggi agar tidak melebihi parent Col */
-  max-width: 100%; /* Batasi lebar agar tidak melebihi parent Col */
+  width: 87%; 
+  height: auto; 
+  aspect-ratio: 16 / 9; 
+  max-height: 100%; 
+  max-width: 100%;
 }

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { ambil_data, modalGeneral as ModalGeneral } from "./control/services";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner, Button, InputGroup, Form } from "react-bootstrap";
 import SelectJabatan from "./control/pejabat";
 import AntrianPtsp from "./control/antrian";
+import { WebSocketContext } from "../main";
 
 const fetchLoketData = async () => {
     return await ambil_data(
@@ -79,8 +80,19 @@ const RenderBeranda = ({bukaModal, tutupModal}) => {
 
     const FormAntrianPtsp = (id_keperluan) =>{
         let header =`Antrian PTSP ${config.nama_satker}`
-        let body = <AntrianPtsp ptspplus={config.ptspplus} onHide={closeModal} id_loket={selectedLoket} id_keperluan={id_keperluan} keperluanlain={keperluanlain} />
+        let body = <AntrianPtsp ptspplus={config.ptspplus} onHide={closeModal} id_loket={selectedLoket} id_keperluan={id_keperluan} keperluanlain={keperluanlain} kirimCetak={kirimCetak} />
         bukaModal(header, body);
+    }
+
+    const { ws } = useContext(WebSocketContext);
+
+    const kirimCetak = (id_loket) => {
+		if (ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify({ type: 'cetak', id: id_loket }));
+		}else{
+			console.error('Error gagal kirim status antrian');
+		}
+        
     }
 
     if (isLoadingLoket){
