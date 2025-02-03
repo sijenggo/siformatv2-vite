@@ -1,9 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Container, Row, Col, Nav, Table, Spinner, Alert, Button } from 'react-bootstrap';
-import { ambil_data, hapus_data, formattedDate, formattedDateLocale } from './control/services';
+import { ambil_data, hapus_data, formattedDate, formattedDateLocale, RenderToast } from './control/services';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
-import { WebSocketContext } from "../main";
+import bell from '../assets/audios/doorbell.wav';
 
 const fetchAntrian = async (id_loket) => {
     let today = new Date();
@@ -40,17 +40,104 @@ const fetchAntrian = async (id_loket) => {
 const Admin = () =>{
     const [activeTab, setActiveTab] = useState(5);
     const [activeId, setActiveId] = useState([]);
+    const [showToast, setShowToast] = useState(false);
+    const playjingle = useMemo(() => new Audio(bell), []);
+    
+    const ws  = useRef(null);
 
+    useEffect(() => {
+        if(ws.current === null){
+            ws.current = new WebSocket("ws://192.168.3.7:93");
+            ws.current.onopen = () => console.log("Connected to WebSocket");
+            ws.current.onmessage = handleWebSocketMessage;
+            ws.current.onclose = () => console.log("WebSocket Disconnected");
+        }
+    }, []);
+
+    const handleWebSocketMessage = (event) => {
+		const data = JSON.parse(event.data);
+		switch (data.type) {
+            case 'update_panggil':
+                setActiveId((prev) => ({
+                    ...prev,
+                    [data.id]: data.status,
+                }));
+            break;
+			default:
+		}
+	};
+    
+    useEffect(() => {
+        const handleWebSocketMessage = (event) => {
+            const data = JSON.parse(event.data);
+            switch (data.type) {
+                case 'update_status':
+                    if (data.id == activeTab) {
+                        handleUpdateStatus();
+                    }
+                break;
+                case 'update_panggil':
+                    setActiveId((prev) => ({
+                        ...prev,
+                        [data.id]: data.status,
+                    }));
+                break;
+                default:
+            }
+        };
+    
+        if (ws.current) {
+            ws.current.onmessage = handleWebSocketMessage;
+        }
+    }, [activeTab]); 
+
+    const handleUpdateStatus = () =>{
+        refretchAntrian();
+        showNotification();
+        const playPromise = playjingle.play();
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    setShowToast(true);
+                })
+                .catch((error) => {
+                    console.error("Error playing sound:", error);
+                    setShowToast(true);
+                });
+        } else {
+            setShowToast(true);
+        }
+    }
+
+    const requestNotificationPermission = async () => {
+        const result = await Swal.fire({
+            title: "Izinkan Notifikasi?",
+            text: "Apakah Anda ingin menerima notifikasi tentang antrian baru?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, izinkan!",
+            cancelButtonText: "Tidak",
+        });
+    
+        if (result.isConfirmed) {
+            Notification.requestPermission().then((perm) => {
+                if (perm === "granted") {
+                    Swal.fire("Berhasil!", "Notifikasi diaktifkan.", "success");
+                } else {
+                    Swal.fire("Ditolak!", "Notifikasi tidak diaktifkan.", "error");
+                }
+            });
+        }
+    };
+    
     const showNotification = () => {
         if (Notification.permission === "granted") {
-        new Notification("Notifikasi SIFORMAT", {
-            body: "Ada antrian baru di PTSP!",
-            icon: "/logo192.png",
-        });
+            new Notification("Notifikasi SIFORMAT", {
+                body: "Ada antrian baru di PTSP!",
+                icon: "/logo192.png",
+            });
         } else {
-        Notification.requestPermission().then((perm) => {
-            if (perm === "granted") showNotification();
-        });
+            requestNotificationPermission();
         }
     };
 
@@ -70,31 +157,9 @@ const Admin = () =>{
         queryClient.invalidateQueries(["antrian", activeTab]);
     }
 
-
-    const { ws, setMessageHandler } = useContext(WebSocketContext);
-
-    useEffect(() => {
-        setMessageHandler((data) => {
-            if (data.type === "update_panggil") {
-                setActiveId((prev) => ({
-                    ...prev,
-                    [data.id]: data.status,
-                }));
-            }else if (data.type === "update_status") {
-                console.log(data.type)
-                /*if(data.id_loket == activeTab){
-                    refretchAntrian();
-                    showNotification();
-                }*/
-            }
-        });
-
-        return () => setMessageHandler(null);
-    }, [setMessageHandler]);
-
     const kirimPanggil = (id) => {
-		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify({ type: 'panggil', id: id }));
+		if (ws.current.readyState === WebSocket.OPEN) {
+			ws.current.send(JSON.stringify({ type: 'panggil', id: id }));
 		}else{
 			console.error('Error gagal kirim status antrian');
 		}
@@ -272,6 +337,7 @@ const Admin = () =>{
                                                             <Button variant="warning" onClick={() => handleReset()}>
                                                                 <b className="text-black">Reset</b>
                                                             </Button>
+                                                            {/* <Button variant='primary' onClick={() => setShowToast(true)}>Coba</Button> */}
                                                         </div>
                                                     </div>
                                                 ) : (
@@ -285,6 +351,7 @@ const Admin = () =>{
                                 </Col>
                             </Row>
                         </Container>
+                        <RenderToast show={showToast} handleToastClose={() => setShowToast(false)}/>
                     </div>
                 </div>
             </div>

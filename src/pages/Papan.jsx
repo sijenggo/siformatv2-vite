@@ -5,7 +5,6 @@ import { Col, Container, Row} from "react-bootstrap";
 import AutoScrollTable from "./control/autoscroll";
 import { useState } from "react";
 import ReactPlayer from "react-player";
-import { WebSocketContext } from "../main";
 
 const fetchAntrian = async (id_loket) => {
     let today = new Date();
@@ -39,22 +38,38 @@ const Papan = () =>{
     const buser = useRef([]);
 
     const queryClient = useQueryClient();
-
-    const { ws, setMessageHandler } = useContext(WebSocketContext);
+    const ws  = useRef(null);
 
     useEffect(() => {
-        setMessageHandler((data) => {
-            if (data.type === "cetak") {
+        if(ws.current === null){
+            ws.current = new WebSocket("ws://192.168.3.7:93");
+            ws.current.onopen = () => console.log("Connected to WebSocket");
+            ws.current.onmessage = handleWebSocketMessage;
+            ws.current.onclose = () => console.log("WebSocket Disconnected");
+        }
+    }, []);
+
+    const handleWebSocketMessage = (event) => {
+		const data = JSON.parse(event.data);
+		switch (data.type) {
+            case 'cetak':
                 CetakAntrian(data.nomor_antrian, data.ket);
                 refetchAllAntrian();
-                //console.log(data.nomor_antrian, data.ket);
-            }else if(data.type === "panggil"){
+            break;
+            case 'panggil':
                 handlePanggil(data.id);
-            }
-        });
+            break;
+			default:
+		}
+	};
 
-        return () => setMessageHandler(null);
-    }, [setMessageHandler]);
+    const kirimPanggil = (id) => {
+		if (ws.current.readyState === WebSocket.OPEN) {
+			ws.current.send(JSON.stringify({ type: 'update_panggil', id: id, status: false }));
+		}else{
+			console.error('Error gagal kirim status antrian');
+		}
+    };
 
     const { data: antrianPerdata = [], isLoading: loadingPerdata } = useQuery({
       queryKey: ["antrian", 2],
@@ -114,14 +129,6 @@ const Papan = () =>{
     
             setUpdateTrigger(prev => prev + 1);
         }
-    };
-
-    const kirimPanggil = (id) => {
-		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify({ type: 'update_panggil', id: id, status: false }));
-		}else{
-			console.error('Error gagal kirim status antrian');
-		}
     };
 
     const handlePanggil = (id) => {
@@ -223,7 +230,7 @@ const Papan = () =>{
                                         <div className="main-display d-flex flex-column justify-content-evenly align-items-center p-1 h-100">
                                             <div className="red-box">
                                                 <ReactPlayer 
-                                                    url="/videos/video1.mp4" 
+                                                    url="/siformat/videos/video1.mp4"
                                                     controls
                                                     playing = {isPlaying}
                                                     loop

@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ambil_data, modalGeneral as ModalGeneral } from "./control/services";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner, Button, InputGroup, Form } from "react-bootstrap";
 import SelectJabatan from "./control/pejabat";
 import AntrianPtsp from "./control/antrian";
-import { WebSocketContext } from "../main";
 
 const fetchLoketData = async () => {
     return await ambil_data(
@@ -27,7 +26,16 @@ const RenderBeranda = ({bukaModal, tutupModal}) => {
     const [selectedLoket, setSelectedLoket] = useState(null);
 	const [warna, setWarna] = useState('blue');
 	const [keperluanlain, setkeperluanlain] = useState('');
-    const config = JSON.parse(localStorage.getItem('config'))
+    const config = JSON.parse(localStorage.getItem('config'));
+    const ws  = useRef(null);
+
+    useEffect(() => {
+        if(ws.current === null){
+            ws.current = new WebSocket("ws://192.168.3.7:93");
+            ws.current.onopen = () => console.log("Connected to WebSocket");
+            ws.current.onclose = () => console.log("WebSocket Disconnected");
+        }
+    }, []);
 
     const { 
         data: loket = [], 
@@ -84,20 +92,17 @@ const RenderBeranda = ({bukaModal, tutupModal}) => {
         bukaModal(header, body);
     }
 
-    const { ws } = useContext(WebSocketContext);
-
     const kirimCetak = (nomor_antrian, ket) => {
-        console.log('kirim cetak', nomor_antrian, ket);
-		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify({ type: 'cetak', nomor_antrian: nomor_antrian, ket: ket }));
+		if (ws.current.readyState === WebSocket.OPEN) {
+			ws.current.send(JSON.stringify({ type: 'cetak', nomor_antrian: nomor_antrian, ket: ket }));
 		}else{
 			console.error('Error gagal kirim status antrian');
 		}
     }
 
     const kirimUpdate = (id) => {
-		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify({ type: 'update_status', id: id }));
+		if (ws.current.readyState === WebSocket.OPEN) {
+			ws.current.send(JSON.stringify({ type: 'update_status', id: id }));
 		}else{
 			console.error('Error gagal kirim status antrian');
 		}
@@ -178,7 +183,7 @@ const RenderBeranda = ({bukaModal, tutupModal}) => {
             </figure>
           </div>
         ))}
-        <Button onClick={kirimUpdate(2)} variant="secondary" size="lg">Kirim</Button>
+        { /* <Button onClick={() => kirimUpdate(6)} variant="secondary" size="lg">Kirim</Button> */ }
       </div>
     );
 };

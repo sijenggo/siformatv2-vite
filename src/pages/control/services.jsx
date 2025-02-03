@@ -1,6 +1,6 @@
 import axios from "axios";
 import Swal from "sweetalert2";
-import { Modal } from "react-bootstrap";
+import { Modal, Toast, ToastContainer } from "react-bootstrap";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 const BASE_URL = `http://192.168.3.7/siformatv2/backend/api/`; //taruh apimu disini
@@ -132,6 +132,31 @@ export const alertNotif = (icon, title, text, footer) =>{
       text: text,
       footer: footer
     });
+}
+
+export const RenderToast = ({show, handleToastClose}) => {
+  return (
+    <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="position-relative"
+      >
+        <ToastContainer
+          className="p-3"
+          position={'bottom-end'}
+          style={{ zIndex: 1 }}
+        >
+          <Toast show={show} onClose={handleToastClose} delay={3000} autohide>
+            <Toast.Header>
+              <img src="/logo192.png" className="rounded w-10 me-2" alt="" />
+              <strong className="me-auto">Notifikasi SIFORMAT</strong>
+              <small>1 Detik yg lalu</small>
+            </Toast.Header>
+            <Toast.Body>Hey, ada antrian Baru!!</Toast.Body>
+          </Toast>
+        </ToastContainer>
+      </div>
+  );
 }
 
 export const prepText = (id_loket, nomor_antrian) => {
