@@ -91,6 +91,47 @@ p {
   height: 90% !important;
 }
 
+
+.w-10 {
+  width: 10% !important;
+}
+
+.w-15 {
+  width: 15% !important;
+}
+
+.w-20 {
+  width: 20% !important;
+}
+
+.w-30 {
+  width: 30% !important;
+}
+
+.w-35 {
+  width: 35% !important;
+}
+
+.w-40 {
+  width: 40% !important;
+}
+
+.w-60 {
+  width: 60% !important;
+}
+
+.w-70 {
+  width: 70% !important;
+}
+
+.w-80 {
+  width: 80% !important;
+}
+
+.w-90 {
+  width: 90% !important;
+}
+
 /*class beranda */
 
 .limiter {
@@ -118,7 +159,7 @@ p {
 
 .wrap{
   width: 70%;
-  background: #fff;
+  background-color: rgba(250, 250, 250, 0.9);
   border-radius: 10px;
   overflow: hidden;
   padding: 40px 0 20px 0;
@@ -818,12 +859,19 @@ div.dataTables_wrapper div.dataTables_info{
 }
 
 .main-content {
-  overflow-y: scroll; /* Scroll hanya untuk vertikal */
+  flex-grow: 1; /* Memperluas ruang main-content */
+  overflow-y: auto; /* Scroll hanya untuk vertikal */
   height: 100%; /* Pastikan mengambil ruang yang tersedia */
   width: 100%;
 }
 
+
 .main-content::-webkit-scrollbar {
+  width: 0px; /* Menyembunyikan scrollbar secara visual */
+  height: 0px;
+}
+
+.hide-scroll::-webkit-scrollbar {
   width: 0px; /* Menyembunyikan scrollbar secara visual */
   height: 0px;
 }
@@ -833,7 +881,7 @@ div.dataTables_wrapper div.dataTables_info{
 }
 
 .main-display {
-  background-color: rgba(248, 249, 250, 0.9);
+  background-color: rgba(250, 250, 250, 0.9);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -869,4 +917,26 @@ div.dataTables_wrapper div.dataTables_info{
   aspect-ratio: 16 / 9; 
   max-height: 100%; 
   max-width: 100%;
+}
+
+.bg-putih-radius{
+  background-color: #fff;
+  border-radius: 10px;
+}
+
+.nav-item {
+  padding: 0.5rem; /* Memberikan padding agar lebih nyaman */
+  border-radius: 4px; /* Opsional untuk sudut bulat */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Animasi halus */
+  display: flex;
+  align-items: center;
+}
+
+.nav-item .nav-link {
+  color: #333; /* Warna default font */
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Warna lebih gelap */
 }

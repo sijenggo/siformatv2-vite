@@ -80,19 +80,27 @@ const RenderBeranda = ({bukaModal, tutupModal}) => {
 
     const FormAntrianPtsp = (id_keperluan) =>{
         let header =`Antrian PTSP ${config.nama_satker}`
-        let body = <AntrianPtsp ptspplus={config.ptspplus} onHide={closeModal} id_loket={selectedLoket} id_keperluan={id_keperluan} keperluanlain={keperluanlain} kirimCetak={kirimCetak} />
+        let body = <AntrianPtsp ptspplus={config.ptspplus} onHide={closeModal} id_loket={selectedLoket} id_keperluan={id_keperluan} keperluanlain={keperluanlain} kirimCetak={kirimCetak} kirimUpdate={kirimUpdate} />
         bukaModal(header, body);
     }
 
     const { ws } = useContext(WebSocketContext);
 
-    const kirimCetak = (id_loket) => {
+    const kirimCetak = (nomor_antrian, ket) => {
+        console.log('kirim cetak', nomor_antrian, ket);
 		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify({ type: 'cetak', id: id_loket }));
+			ws.send(JSON.stringify({ type: 'cetak', nomor_antrian: nomor_antrian, ket: ket }));
 		}else{
 			console.error('Error gagal kirim status antrian');
 		}
-        
+    }
+
+    const kirimUpdate = (id) => {
+		if (ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify({ type: 'update_status', id: id }));
+		}else{
+			console.error('Error gagal kirim status antrian');
+		}
     }
 
     if (isLoadingLoket){
@@ -170,6 +178,7 @@ const RenderBeranda = ({bukaModal, tutupModal}) => {
             </figure>
           </div>
         ))}
+        <Button onClick={kirimUpdate(2)} variant="secondary" size="lg">Kirim</Button>
       </div>
     );
 };

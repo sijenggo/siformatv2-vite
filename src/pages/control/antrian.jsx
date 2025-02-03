@@ -14,7 +14,7 @@ const validationSchema = Yup.object({
       .required('Nomor HP wajib diisi.'),
 });
 
-const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, kirimCetak}) =>{
+const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, kirimCetak, kirimUpdate}) =>{
     const { Formik } = formik;
     const submit = async(values) =>{
         let today = new Date();
@@ -27,11 +27,12 @@ const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, k
 
         try {
             const res_index = await ambil_data(`SELECT COUNT(*) AS indexantrian FROM tmp_antrian WHERE id_loket = ${id_loket}`);
-            const res_loket = await ambil_data(`SELECT kode, nama_loket FROM sys_loket WHERE id_loket = ${id_loket}`)
+            const res_loket = await ambil_data(`SELECT kode, nama_loket, ket FROM sys_loket WHERE id_loket = ${id_loket}`)
             const res_keperluan = await ambil_data(`SELECT keperluan FROM sys_keperluan WHERE id_keperluan = ${id_keperluan}`)
             const newIndexAntrian = parseInt(res_index[0]?.indexantrian || 0) + 1;
             const kodeAntrian = res_loket[0]?.kode;
-            data.nomor_antrian = `${kodeAntrian} - ${newIndexAntrian}`;
+            const nomorAntrian = `${kodeAntrian} - ${newIndexAntrian}`;
+            data.nomor_antrian = nomorAntrian;
             data.id_loket = id_loket;
             data.id_keperluan = id_keperluan;
             data.keperluan_lain = keperluanlain || '';
@@ -129,7 +130,8 @@ const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, k
             if (post_antrian.success && post_tmp_antrian.success) {
                 onHide();
                 Swal.fire("Terimakasih..", "", "success");
-                kirimCetak(id_loket);
+                kirimCetak(nomorAntrian, res_loket[0]?.ket);
+                kirimUpdate(id_loket);
             } else {
                 alertNotif('error', 'Data error', `${post_antrian.message} ${post_tmp_antrian.message}`, `<p class="p-0 mb-0 fs-xsmall">Error pada proses simpan data</p>`);
             }
@@ -152,7 +154,7 @@ const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, k
             >
             {({ handleSubmit, handleChange, handleBlur, values, touched, errors, setFieldValue }) => (
                 <Form name='formKunjungan' noValidate onSubmit={handleSubmit}>
-                    <Form.Group className="mb-2 w-60" controlId="formNama">
+                    <Form.Group className="mb-2" controlId="formNama">
                         <Form.Label>Nama Lengkap</Form.Label>
                         <Form.Control 
                             value={values.nama}
@@ -168,7 +170,7 @@ const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, k
                             {errors.nama}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group className="mb-2 w-60" controlId="formAlamat">
+                    <Form.Group className="mb-2" controlId="formAlamat">
                         <Form.Label>Alamat</Form.Label>
                         <Form.Control 
                             value={values.alamat} 
@@ -180,7 +182,7 @@ const AntrianPtsp = ({ptspplus, onHide, id_loket, id_keperluan, keperluanlain, k
                             rows={3} 
                         />
                     </Form.Group>
-                    <Form.Group className="mb-2 w-60" controlId="formNohp">
+                    <Form.Group className="mb-2" controlId="formNohp">
                         <Form.Label>Nomor Handphone</Form.Label>
                         <Form.Control 
                             value={values.nohp}

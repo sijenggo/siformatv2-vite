@@ -60,7 +60,7 @@ const ItemPanggil = ({ id, id_loket, nomor_antrian, ket, onSpeechEnd, onSpeechSt
                 start();
             }
         }
-        onSpeechStart(nomor_antrian, ket);
+        onSpeechStart(id, nomor_antrian, ket);
     };
 
     const handleStop = () => {
@@ -127,7 +127,7 @@ const AutoScrollTable = ({ antrian, loading, handleOnEnd, handleOnStart }) => {
     }, [antrian, containerId]);
 
     return (
-        <div id={containerId} ref={tableRef} style={{ overflowY: "hidden", maxHeight: "200px" }}>
+        <div id={containerId} ref={tableRef} style={{ overflowY: "hidden", maxHeight: "100%" }}>
             {loading ? (
                 <p>Loading data...</p>
             ) : antrian.length > 0 ? (

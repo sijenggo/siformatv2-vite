@@ -2,6 +2,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { Modal } from "react-bootstrap";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 const BASE_URL = `http://192.168.3.7/siformatv2/backend/api/`; //taruh apimu disini
 
 export const connectWs = (url, onMessage) => {
@@ -38,6 +39,23 @@ export const tambah_data = async (table, data, ptspplus) => {
     throw error;
   }
 };
+
+export const hapus_data = async (table, id) => {
+  try {
+    const response = await axios.post(`${BASE_URL}hapus_data`, {
+      table,
+      id
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting data:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
 
 export const fetchJabPTSP = async () => {
   try {
@@ -101,6 +119,10 @@ export const formattedDate = (date) =>{
 
 export const formattedDateHourMinute = (date) =>{
   return format(date, 'yyyy-MM-dd HH:mm:ss');
+};
+
+export const formattedDateLocale = (date) =>{
+  return format(date, 'd MMMM yyyy HH:mm', {locale: id});
 };
 
 export const alertNotif = (icon, title, text, footer) =>{

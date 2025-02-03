@@ -8,6 +8,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./assets/css/fontawesome-free-6.5.2-web/css/all.min.css";
 import Home from "./pages/Home";
 import Papan from "./pages/Papan";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 export const WebSocketContext = createContext(null);
@@ -53,6 +54,7 @@ const App = () => (
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/papan" element={<Papan />} />
+                    <Route path="/admin" element={<Admin />} />
                 </Routes>
             </WebSocketProvider>
         </QueryClientProvider>
